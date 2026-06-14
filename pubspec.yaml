@@ -1,0 +1,57 @@
+name: gildongmu
+description: "길동무 — 지방축제 통합 내비게이션. 한국관광공사 TourAPI 기반."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # 상태 관리
+  provider: ^6.1.2
+
+  # 네트워크 (한국관광공사 TourAPI)
+  http: ^1.2.2
+
+  # 폰트 (Noto Sans KR / Noto Serif KR / Hahmlet / Bagel Fat One)
+  google_fonts: ^6.2.1
+
+  # 위치
+  geolocator: ^13.0.1
+
+  # 지도 (구글맵 — 카카오맵 대안은 README 참고)
+  google_maps_flutter: ^2.9.0
+
+  # 이미지 캐싱 (TourAPI firstimage)
+  cached_network_image: ^3.4.1
+
+  # 로컬 저장 (온보딩 완료/선호도/찜)
+  shared_preferences: ^2.3.2
+
+  # 외부 앱 연동 (카카오내비, 전화)
+  url_launcher: ^6.3.1
+
+  # 공유 (축제 정보 공유)
+  share_plus: ^10.1.2
+
+  # 인앱 카카오맵 길찾기 (모바일 전용 WebView)
+  webview_flutter: ^4.10.0
+
+  # 날짜 포맷
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  # 로컬 폴백 이미지 / 일러스트가 필요하면 여기에 등록
+  assets:
+    - assets/

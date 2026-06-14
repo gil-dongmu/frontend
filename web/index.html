@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="길동무 — 지방축제 통합 내비게이션">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="길동무">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>길동무 · GilDongMu</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!--
+    Kakao JavaScript SDK (카카오내비 호출용).
+
+    JS 키는 Dart 측 ApiConfig.kakaoJsKey 에서 주입한다.
+    Dart 가 window.gdmKakaoInit(key) 를 호출하면 SDK 초기화가 일어나고,
+    이후 window.gdmKakaoNaviStart(name, x, y) 로 길안내를 시작한다.
+
+    초기화 실패/SDK 미로드 시 함수는 명시적 에러 문자열을 반환해
+    Dart 폴백 로직(카카오맵 길찾기 링크)을 트리거한다.
+  -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
+  <script>
+    window.gdmKakaoInit = function (key) {
+      if (!window.Kakao) return 'NO_SDK';
+      try {
+        if (!window.Kakao.isInitialized()) {
+          window.Kakao.init(key);
+        }
+        return window.Kakao.isInitialized() ? 'OK' : 'INIT_FAILED';
+      } catch (e) {
+        return 'ERROR:' + (e && e.message ? e.message : String(e));
+      }
+    };
+
+    window.gdmKakaoNaviStart = function (name, x, y) {
+      if (!window.Kakao) return 'NO_SDK';
+      if (!window.Kakao.isInitialized()) return 'NOT_INIT';
+      if (!window.Kakao.Navi) return 'NAVI_UNAVAILABLE';
+      try {
+        // coordType wgs84 : 위경도 좌표계
+        window.Kakao.Navi.start({
+          name: name,
+          x: x,                 // 경도 (longitude)
+          y: y,                 // 위도  (latitude)
+          coordType: 'wgs84'
+        });
+        return 'OK';
+      } catch (e) {
+        return 'ERROR:' + (e && e.message ? e.message : String(e));
+      }
+    };
+  </script>
+
+  <script src="flutter_bootstrap.js" async></script>
+</head>
+<body>
+</body>
+</html>

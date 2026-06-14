@@ -1,0 +1,23 @@
+# 빌드/IDE
+.dart_tool/
+.idea/
+.vscode/
+build/
+*.iml
+.DS_Store
+
+# Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+
+# 환경 변수 (API 키)
+.env
+lib/services/api_keys.dart
+
+# 안드로이드/iOS 로컬 설정
+android/local.properties
+android/key.properties
+ios/Flutter/flutter_export_environment.sh
+**/.gradle/
