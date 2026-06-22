@@ -68,25 +68,12 @@ class ApiConfig {
     defaultValue: '',
   );
 
-  // ── 네이버 로그인 (flutter_naver_login) ─────────────────
-  // developers.naver.com 애플리케이션의 Client ID / Secret / 앱 이름.
-  // env.json 으로 주입한다.
-  static const naverClientId = String.fromEnvironment(
-    'NAVER_CLIENT_ID',
-    defaultValue: '',
-  );
-  static const naverClientSecret = String.fromEnvironment(
-    'NAVER_CLIENT_SECRET',
-    defaultValue: '',
-  );
-  static const naverClientName = String.fromEnvironment(
-    'NAVER_CLIENT_NAME',
-    defaultValue: '길동무',
-  );
+  // ── 네이버 로그인 (flutter_naver_login 2.x) ─────────────
+  // 2.x 부터 Dart initSdk 가 없어졌다. Client ID / Secret / 앱 이름은
+  // android/app/src/main/res/values/strings.xml + AndroidManifest.xml,
+  // iOS Info.plist 에서 네이티브 SDK 가 직접 읽어가므로 여기서 다루지 않는다.
 
   static bool get hasTourKey => tourApiKey.isNotEmpty;
   static bool get hasKakaoJsKey => kakaoJsKey.isNotEmpty;
   static bool get hasKakaoNativeKey => kakaoNativeAppKey.isNotEmpty;
-  static bool get hasNaverKeys =>
-      naverClientId.isNotEmpty && naverClientSecret.isNotEmpty;
 }

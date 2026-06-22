@@ -1,7 +1,15 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// local.properties 에서 민감한 값을 읽어 빌드 시 resValue 로 주입한다.
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
 }
 
 android {
@@ -19,10 +27,14 @@ android {
         applicationId = "com.gildongmu.gildongmu"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // local.properties 에서 주입 — strings.xml 에 하드코딩하지 않는다.
+        resValue("string", "naver_client_secret",
+            localProps.getProperty("naver.client.secret") ?: error("naver.client.secret not set in local.properties"))
     }
 
     buildTypes {

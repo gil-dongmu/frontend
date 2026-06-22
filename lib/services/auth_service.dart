@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_naver_login/flutter_naver_login.dart';
+import 'package:flutter_naver_login/interface/types/naver_login_result.dart';
+import 'package:flutter_naver_login/interface/types/naver_login_status.dart';
+import 'package:flutter_naver_login/interface/types/naver_token.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -99,7 +102,7 @@ class AuthService {
       );
     } on KakaoClientException catch (e) {
       throw SocialLoginException(
-        e.msg ?? '카카오 로그인을 취소했습니다.',
+        e.msg.isNotEmpty ? e.msg : '카카오 로그인을 취소했습니다.',
         cancelled: e.reason == ClientErrorCause.cancelled,
       );
     } on Exception catch (e) {
@@ -129,16 +132,25 @@ class AuthService {
             cancelled: true);
       }
 
-      final NaverAccessToken token =
-          await FlutterNaverLogin.currentAccessToken;
-      socialAccessToken = token.accessToken;
+      // logIn() 내부는 getCurrentAccount() 를 호출해 계정 정보만 반환하고
+      // accessToken 은 null 로 내려온다 — 토큰은 별도로 조회해야 한다.
+      final NaverToken naverToken = await FlutterNaverLogin.getCurrentAccessToken();
+      if (naverToken.accessToken.isEmpty) {
+        throw const SocialLoginException('네이버 토큰을 받지 못했습니다.');
+      }
+      socialAccessToken = naverToken.accessToken;
 
+      // 2.x 부터 계정 필드는 모두 nullable 이다.
       final account = result.account;
-      providerId = account.id;
-      name = account.nickname.isNotEmpty
-          ? account.nickname
-          : (account.name.isNotEmpty ? account.name : name);
-      email = account.email.isNotEmpty ? account.email : null;
+      providerId = account?.id ?? '';
+      final nickname = account?.nickname;
+      final realName = account?.name;
+      name = (nickname != null && nickname.isNotEmpty)
+          ? nickname
+          : (realName != null && realName.isNotEmpty ? realName : name);
+      final accountEmail = account?.email;
+      email =
+          (accountEmail != null && accountEmail.isNotEmpty) ? accountEmail : null;
     } on SocialLoginException {
       rethrow;
     } on Exception catch (e) {
