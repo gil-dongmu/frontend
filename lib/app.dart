@@ -5,9 +5,11 @@ import 'providers/app_state.dart';
 import 'theme/app_theme.dart';
 import 'theme/app_colors.dart';
 import 'models/festival.dart';
+import 'models/user_profile.dart';
 import 'widgets/bottom_nav.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/nickname_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/discover_screen.dart';
@@ -33,7 +35,7 @@ class GilDongMuApp extends StatelessWidget {
   }
 }
 
-enum _Phase { splash, login, onboarding, main }
+enum _Phase { splash, login, nickname, onboarding, main }
 
 class _Root extends StatefulWidget {
   const _Root();
@@ -65,7 +67,22 @@ class _RootState extends State<_Root> {
     });
   }
 
-  void _onSignedIn() => setState(() => phase = _Phase.onboarding);
+  void _onSignedIn(AuthResult result) {
+    setState(() {
+      if (result.profile.isGuest) {
+        // 게스트는 닉네임 없이 바로 온보딩
+        phase = _Phase.onboarding;
+      } else if (result.isNewUser) {
+        // 신규 회원 → 닉네임 설정 → 온보딩
+        phase = _Phase.nickname;
+      } else {
+        // 기존 회원 → 바로 메인
+        phase = _Phase.main;
+      }
+    });
+  }
+
+  void _onNicknameDone() => setState(() => phase = _Phase.onboarding);
 
   void _onOnboardingDone() => setState(() => phase = _Phase.main);
 
@@ -76,6 +93,7 @@ class _RootState extends State<_Root> {
     return switch (phase) {
       _Phase.splash => SplashScreen(onDone: _onSplashDone),
       _Phase.login => LoginScreen(onSignedIn: _onSignedIn),
+      _Phase.nickname => NicknameScreen(onDone: _onNicknameDone),
       _Phase.onboarding => OnboardingScreen(onDone: _onOnboardingDone),
       _Phase.main => _MainShell(onSignOut: _onSignOut),
     };

@@ -3,23 +3,38 @@ import 'package:provider/provider.dart';
 
 import '../models/user_profile.dart';
 import '../providers/app_state.dart';
+import '../services/api_client.dart';
+import '../services/auth_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 
 /// 소셜 로그인 진입 화면.
 ///
 /// 단청 팔레트(크림 베이스 + 주홍/먹빛) 기반 에디토리얼 카드 형태.
-/// Mock 흐름이라 어떤 버튼을 누르든 SDK 호출 없이 데모 프로필이 들어온다.
+/// 카카오/네이버 SDK 로 로그인한 뒤 백엔드에서 JWT 를 발급받는다.
+/// 신규 회원이면 [onSignedIn] 에 isNewUser=true 가 전달되어
+/// 닉네임 설정 화면으로 이어진다.
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key, required this.onSignedIn});
 
-  final VoidCallback onSignedIn;
+  /// (isNewUser) — 신규 회원이면 닉네임 설정으로 분기한다.
+  final void Function(AuthResult result) onSignedIn;
 
   Future<void> _signIn(BuildContext context, AuthProvider provider) async {
     final app = context.read<AppState>();
-    final user = await app.signIn(provider);
-    if (user != null && context.mounted) {
-      onSignedIn();
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final result = await app.signIn(provider);
+      if (result != null && context.mounted) {
+        onSignedIn(result);
+      }
+    } on SocialLoginException catch (e) {
+      // 취소는 app.signIn 단계에서 null 로 흡수됨 — 여기 오는 건 실제 오류
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } on ApiException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } on NetworkException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
     }
   }
 
@@ -48,13 +63,12 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               _ProviderButton(
-                provider: AuthProvider.google,
-                label: '구글로 시작하기',
-                icon: const _GoogleMark(),
+                provider: AuthProvider.naver,
+                label: '네이버로 시작하기',
+                icon: const _NaverMark(),
                 disabled: disabled,
-                loading: app.signingInProvider == AuthProvider.google,
-                bordered: true,
-                onTap: () => _signIn(context, AuthProvider.google),
+                loading: app.signingInProvider == AuthProvider.naver,
+                onTap: () => _signIn(context, AuthProvider.naver),
               ),
               const SizedBox(height: 18),
               _GuestRow(
@@ -264,9 +278,10 @@ class _KakaoMark extends StatelessWidget {
   }
 }
 
-/// G 문자 — 구글 로고 대체
-class _GoogleMark extends StatelessWidget {
-  const _GoogleMark();
+/// N 문자 — 네이버 로고 대체 (흰 N on 네이버 그린은 버튼 배경이 이미 초록이라
+/// 여기서는 화이트 라운드 위 그린 N 으로 대비를 준다)
+class _NaverMark extends StatelessWidget {
+  const _NaverMark();
 
   @override
   Widget build(BuildContext context) {
@@ -275,22 +290,13 @@ class _GoogleMark extends StatelessWidget {
       height: 22,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF4285F4),
-            Color(0xFF34A853),
-            Color(0xFFFBBC05),
-            Color(0xFFEA4335),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(11),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        'G',
-        style: AppType.display(size: 13, color: Colors.white)
-            .copyWith(height: 1),
+        'N',
+        style: AppType.display(size: 13, color: const Color(0xFF03C75A))
+            .copyWith(height: 1, fontWeight: FontWeight.w900),
       ),
     );
   }

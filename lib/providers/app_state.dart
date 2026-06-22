@@ -41,18 +41,32 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<UserProfile?> signIn(AuthProvider provider) async {
+  /// 소셜/게스트 로그인. 성공 시 [AuthResult] (프로필 + 신규회원 여부)를,
+  /// 사용자가 취소하면 null 을 반환한다. 그 외 오류는 그대로 던진다.
+  Future<AuthResult?> signIn(AuthProvider provider) async {
     isSigningIn = true;
     signingInProvider = provider;
     notifyListeners();
     try {
-      currentUser = await _auth.signIn(provider);
-      return currentUser;
+      final result = await _auth.signIn(provider);
+      currentUser = result.profile;
+      return result;
+    } on SocialLoginException catch (e) {
+      // 사용자가 로그인 창을 닫은 경우는 조용히 무시, 그 외는 재던짐
+      if (e.cancelled) return null;
+      rethrow;
     } finally {
       isSigningIn = false;
       signingInProvider = null;
       notifyListeners();
     }
+  }
+
+  /// 신규 회원 닉네임 설정 (`PATCH /api/v1/users/me`).
+  /// 중복 등 실패 시 [ApiException] 을 던진다.
+  Future<void> setNickname(String nickname) async {
+    currentUser = await _auth.setNickname(nickname);
+    notifyListeners();
   }
 
   Future<void> signOut() async {

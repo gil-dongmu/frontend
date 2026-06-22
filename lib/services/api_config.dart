@@ -44,6 +44,49 @@ class ApiConfig {
     defaultValue: '',
   );
 
+  // ── 길동무 백엔드 (소셜 로그인 / 인증) ───────────────────
+  //
+  // 백엔드는 소셜 access token을 받아 자체 JWT를 발급한다.
+  //   POST /api/v1/auth/login/{provider}   provider = kakao | naver
+  //   POST /api/v1/auth/reissue
+  //   POST /api/v1/auth/logout
+  //   PATCH /api/v1/users/me               (닉네임 설정)
+  //
+  // 기본값은 Android 에뮬레이터에서 호스트(localhost:8080)에 접근하는 주소.
+  // iOS 시뮬레이터/실기기/배포 시에는 --dart-define 로 덮어쓴다.
+  //   flutter run --dart-define=API_BASE_URL=https://api.gildongmu.app
+  static const apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://10.0.2.2:8080',
+  );
+
+  /// 카카오 네이티브 앱 키 — KakaoSdk.init(nativeAppKey: ...) 에 사용.
+  /// 안전을 위해 소스에 직접 두지 말고 env.json(.gitignore) 으로 주입하세요.
+  ///   flutter run --dart-define-from-file=env.json
+  static const kakaoNativeAppKey = String.fromEnvironment(
+    'KAKAO_NATIVE_APP_KEY',
+    defaultValue: '',
+  );
+
+  // ── 네이버 로그인 (flutter_naver_login) ─────────────────
+  // developers.naver.com 애플리케이션의 Client ID / Secret / 앱 이름.
+  // env.json 으로 주입한다.
+  static const naverClientId = String.fromEnvironment(
+    'NAVER_CLIENT_ID',
+    defaultValue: '',
+  );
+  static const naverClientSecret = String.fromEnvironment(
+    'NAVER_CLIENT_SECRET',
+    defaultValue: '',
+  );
+  static const naverClientName = String.fromEnvironment(
+    'NAVER_CLIENT_NAME',
+    defaultValue: '길동무',
+  );
+
   static bool get hasTourKey => tourApiKey.isNotEmpty;
   static bool get hasKakaoJsKey => kakaoJsKey.isNotEmpty;
+  static bool get hasKakaoNativeKey => kakaoNativeAppKey.isNotEmpty;
+  static bool get hasNaverKeys =>
+      naverClientId.isNotEmpty && naverClientSecret.isNotEmpty;
 }

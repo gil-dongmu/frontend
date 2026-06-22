@@ -14,8 +14,15 @@ dependencies:
   # 상태 관리
   provider: ^6.1.2
 
-  # 네트워크 (한국관광공사 TourAPI)
+  # 네트워크 (한국관광공사 TourAPI / 길동무 백엔드)
   http: ^1.2.2
+
+  # 소셜 로그인 SDK (소셜 access token 획득 → 백엔드에 전달)
+  kakao_flutter_sdk_user: ^1.9.7+3
+  flutter_naver_login: ^1.8.0
+
+  # JWT 안전 저장 (Keychain / EncryptedSharedPreferences)
+  flutter_secure_storage: ^9.2.2
 
   # 폰트 (Noto Sans KR / Noto Serif KR / Hahmlet / Bagel Fat One)
   google_fonts: ^6.2.1

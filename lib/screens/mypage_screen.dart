@@ -81,7 +81,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text(user?.name ?? '축제 동무',
+                        Text(user?.displayName ?? '축제 동무',
                             style: AppType.display(
                                 size: 22, color: AppColors.cream)),
                         if (user?.email != null) ...[
@@ -339,7 +339,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
         content: Text(
           app.currentUser?.isGuest ?? true
               ? '둘러보기 세션이 종료됩니다.'
-              : '${app.currentUser?.name ?? "계정"} 으로 다시 로그인할 수 있어요.',
+              : '${app.currentUser?.displayName ?? "계정"} 으로 다시 로그인할 수 있어요.',
           style: AppType.body(size: 13, color: AppColors.inkSoft),
         ),
         actions: [

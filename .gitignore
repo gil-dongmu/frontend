@@ -21,3 +21,6 @@ android/local.properties
 android/key.properties
 ios/Flutter/flutter_export_environment.sh
 **/.gradle/
+
+# 소셜 로그인 키 (커밋 금지)
+env.json
