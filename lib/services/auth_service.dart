@@ -127,6 +127,10 @@ class AuthService {
 
     try {
       final NaverLoginResult result = await FlutterNaverLogin.logIn();
+      if (result.status == NaverLoginStatus.error) {
+        // 설정/등록 오류 등은 '취소'가 아니므로 화면에 그대로 노출한다.
+        throw SocialLoginException('네이버 로그인 설정 오류입니다. ($result)');
+      }
       if (result.status != NaverLoginStatus.loggedIn) {
         throw const SocialLoginException('네이버 로그인을 취소했습니다.',
             cancelled: true);
