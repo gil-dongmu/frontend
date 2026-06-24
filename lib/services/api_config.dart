@@ -73,7 +73,23 @@ class ApiConfig {
   // android/app/src/main/res/values/strings.xml + AndroidManifest.xml,
   // iOS Info.plist 에서 네이티브 SDK 가 직접 읽어가므로 여기서 다루지 않는다.
 
+  // ── 카카오 길찾기(내비) / 인앱 지도 ──────────────────────
+  // 카카오모빌리티 '자동차 길찾기' REST API 호출용 키 (Authorization: KakaoAK ...).
+  //   developers.kakao.com > 내 앱 > REST API 키, 그리고 카카오내비/길찾기 사용 설정.
+  static const kakaoRestApiKey = String.fromEnvironment(
+    'KAKAO_REST_API_KEY',
+    defaultValue: '',
+  );
+
+  // 인앱 카카오맵 WebView 의 baseUrl — 카카오 JS SDK 의 도메인 검사를 통과시키기
+  // 위해 사용한다. 이 도메인을 카카오 콘솔 > 플랫폼 > Web 사이트 도메인에 등록해야 한다.
+  static const kakaoMapBaseUrl = String.fromEnvironment(
+    'KAKAO_MAP_BASE_URL',
+    defaultValue: 'https://localhost',
+  );
+
   static bool get hasTourKey => tourApiKey.isNotEmpty;
   static bool get hasKakaoJsKey => kakaoJsKey.isNotEmpty;
+  static bool get hasKakaoRestKey => kakaoRestApiKey.isNotEmpty;
   static bool get hasKakaoNativeKey => kakaoNativeAppKey.isNotEmpty;
 }
