@@ -24,6 +24,7 @@ android {
 
     buildFeatures {
         resValues = true
+        buildConfig = true
     }
 
     defaultConfig {
@@ -31,7 +32,7 @@ android {
         applicationId = "com.gildongmu.gildongmu"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 26 // 카카오내비 KNSDK 요구사항(API 26+)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -39,6 +40,17 @@ android {
         // local.properties 에서 주입 — strings.xml 에 하드코딩하지 않는다.
         resValue("string", "naver_client_secret",
             localProps.getProperty("naver.client.secret") ?: error("naver.client.secret not set in local.properties"))
+
+        // 카카오내비(KNSDK) 네이티브 앱 키 — local.properties 의 knsdk.app.key 에서 주입
+        buildConfigField(
+            "String", "KNSDK_APP_KEY",
+            "\"${localProps.getProperty("knsdk.app.key") ?: ""}\""
+        )
+
+        // KNSDK(Realm) APK 용량 최적화용 ABI 필터
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
+        }
     }
 
     buildTypes {
@@ -59,6 +71,11 @@ kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
+}
+
+dependencies {
+    // 카카오내비 길찾기 SDK with UI — KNNaviView, KNGuidance 등 인앱 주행 화면
+    implementation("com.kakaomobility.knsdk:knsdk_ui:1.12.7")
 }
 
 flutter {

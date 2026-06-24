@@ -65,6 +65,13 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- 카카오내비 인앱 주행 화면 -->
+        <activity
+            android:name=".KNNaviActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

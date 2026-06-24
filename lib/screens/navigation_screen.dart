@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart'
     show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:provider/provider.dart';
 
 import '../providers/app_state.dart';
@@ -9,6 +10,7 @@ import 'guidance_screen.dart';
 import 'in_app_map_screen.dart';
 import '../models/course.dart';
 import '../services/kakao_navi_service.dart';
+import '../services/kakao_navi_sdk_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../widgets/common.dart';
@@ -398,7 +400,29 @@ class _NavigationScreenState extends State<NavigationScreen> {
   int get _dur => (_dist / _speedKmh * 60).round().clamp(1, 5999);
 
   /// 인앱 내비 시작 — 외부 앱 없이 앱 안에서 주행 안내가 진행된다
-  void _startGuidance() {
+  Future<void> _startGuidance() async {
+    final app = context.read<AppState>();
+    // Android 에서는 카카오내비 인앱 주행(KNSDK)을 우선 시도.
+    // (KNSDK 앱키/초기화 미설정 등 실패 시 자체 안내 화면으로 폴백)
+    if (!kIsWeb &&
+        defaultTargetPlatform == TargetPlatform.android &&
+        widget.festival.lat != 0 &&
+        widget.festival.lng != 0) {
+      try {
+        await KakaoNaviSdkService.startGuidance(
+          startLat: app.myLat,
+          startLng: app.myLng,
+          startName: '내 위치',
+          goalLat: widget.festival.lat,
+          goalLng: widget.festival.lng,
+          goalName: widget.festival.name,
+        );
+        return;
+      } on PlatformException {
+        // 폴백: 자체 주행 안내 시뮬레이션
+      }
+    }
+    if (!mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
